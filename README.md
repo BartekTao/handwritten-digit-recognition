@@ -14,8 +14,9 @@
     * comfirm download param? true or false?
 4. TODO 15
     * `torch.save(model, MODEL_PATH)` or `torch.save(model.state_dict(), MODEL_PATH)` or ???
+5. To be able to answer the TA's questions, we need to complete the README.md file and comment.(others can know the knowledge by reading README.md.)
 
-## Other
+## Others
 
 https://colab.research.google.com/
 
