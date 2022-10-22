@@ -91,10 +91,9 @@ def validation(model, device, valid_loader, criterion):
 
             # ================================
             # TODO 8: calculate accuracy, loss
-            log_probabilities = model(data)
-            valid_loss += criterion(log_probabilities, target)
+            valid_loss += criterion(output, target)
 
-            probabilities = torch.exp(log_probabilities)
+            probabilities = torch.exp(output)
             top_prob, top_class = probabilities.topk(1, dim=1)
             predictions = top_class == target.view(*top_class.shape)
             valid_acc += torch.mean(predictions.type(torch.FloatTensor))
@@ -111,7 +110,7 @@ def validation(model, device, valid_loader, criterion):
 def main():
     # ==================
     # TODO 9: set device
-    device = ("cuda" if torch.cuda.is_available() else "cpu")
+    device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
     # ==================
 
 
