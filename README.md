@@ -1,3 +1,22 @@
+# handwrite digit recognition
+
+## TODO
+
+1. TODO 1, 2: finish model
+2. TODO 10:
+    * change the params below
+      * LEARNING_RATE = 0.01
+      * BATCH_SIZE = 50
+      * EPOCHS = 10
+    * set train data, valid data to `TRAIN_DATA_PATH`, `VALID_DATA_PATH`
+3. TODO 11: transforms
+    * finish: may be adding some data augmentations?
+    * comfirm download param? true or false?
+4. TODO 15
+    * `torch.save(model, MODEL_PATH)` or `torch.save(model.state_dict(), MODEL_PATH)` or ???
+
+## Other
+
 https://colab.research.google.com/
 
 `!nvidia-smi` 顯示GPU狀況
