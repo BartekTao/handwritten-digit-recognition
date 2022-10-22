@@ -41,7 +41,7 @@ def calc_acc(output, target):
 def training(model, device, train_loader, criterion, optimizer):
     # ===============================
     # TODO 3: switch the model to training mode
-    model.???
+    model.train()
     # ===============================
     train_acc = 0.0
     train_loss = 0.0
@@ -51,16 +51,16 @@ def training(model, device, train_loader, criterion, optimizer):
 
         # =============================================
         # TODO 4: initialize optimizer to zero gradient
-        optimizer.???
+        optimizer.zero_grad()
         # =============================================
 
         output = model(data)
 
         # =================================================
         # TODO 5: loss -> backpropagation -> update weights
-        loss = criterion(???, ???)
-        loss.???
-        optimizer.???
+        loss = criterion(output, target)
+        loss.backward()
+        optimizer.step()
         # =================================================
 
         train_acc += calc_acc(output, target)
@@ -75,14 +75,14 @@ def training(model, device, train_loader, criterion, optimizer):
 def validation(model, device, valid_loader, criterion):
     # ===============================
     # TODO 6: switch the model to validation mode
-    model.???
+    model.eval()
     # ===============================
     valid_acc = 0.0
     valid_loss = 0.0
 
     # =========================================
     # TODO 7: turn off the gradient calculation
-    with ???:
+    with torch.no_grad():
     # =========================================
         for data, target in valid_loader:
             data, target = data.to(device), target.to(device)
@@ -91,7 +91,13 @@ def validation(model, device, valid_loader, criterion):
 
             # ================================
             # TODO 8: calculate accuracy, loss
+            log_probabilities = model(data)
+            valid_loss += criterion(log_probabilities, target)
 
+            probabilities = torch.exp(log_probabilities)
+            top_prob, top_class = probabilities.topk(1, dim=1)
+            predictions = top_class == target.view(*top_class.shape)
+            valid_acc += torch.mean(predictions.type(torch.FloatTensor))
 
 
             # ================================
@@ -105,19 +111,19 @@ def validation(model, device, valid_loader, criterion):
 def main():
     # ==================
     # TODO 9: set device
-    device = ???
+    device = ("cuda" if torch.cuda.is_available() else "cpu")
     # ==================
 
 
     # ========================
     # TODO 10: hyperparameters
     # you can add your parameters here
-    LEARNING_RATE = ???
-    BATCH_SIZE = ???
-    EPOCHS = ???
-    TRAIN_DATA_PATH = ???
-    VALID_DATA_PATH = ???
-    MODEL_PATH = ???
+    LEARNING_RATE = 0.01
+    BATCH_SIZE = 50
+    EPOCHS = 10
+    TRAIN_DATA_PATH = './data/train/'
+    VALID_DATA_PATH = './data/valid/'
+    MODEL_PATH = 'hanwritten-digit.pt'
 
     # ========================
 
@@ -140,23 +146,23 @@ def main():
     # =================
     # TODO 12: set up datasets
     # hint: ImageFolder?
-    train_data = ???
-    valid_data = ???
+    train_data = datasets.MNIST(TRAIN_DATA_PATH, download=True, train=True, transform=train_transform)
+    valid_data = datasets.MNIST(VALID_DATA_PATH, download=True, train=False, transform=valid_transform)
     # =================
 
 
     # ============================
     # TODO 13 : set up dataloaders
-    train_loader = ???
-    valid_loader = ???
+    train_loader = torch.utils.data.DataLoader(train_data, batch_size=BATCH_SIZE, shuffle=True)
+    valid_loader = torch.utils.data.DataLoader(valid_data, batch_size=BATCH_SIZE, shuffle=True)
     # ============================
 
     # build model, criterion and optimizer
     model = Net().to(device).train()
     # ================================
     # TODO 14: criterion and optimizer
-    criterion = ???
-    optimizer = ???
+    criterion = nn.CrossEntropyLoss()
+    optimizer = torch.optim.SGD(model.parameters(), lr=LEARNING_RATE)
     # ================================
 
 
@@ -179,7 +185,7 @@ def main():
 
     # ==================================
     # TODO 15: save the model parameters
-    torch.???
+    torch.save(model, MODEL_PATH)
     # ==================================
 
 
@@ -187,7 +193,10 @@ def main():
     # TODO 16: draw accuracy and loss pictures
     # lab2_teamXX_accuracy.png, lab2_teamXX_loss.png
     # hint: plt.plot
-
+    plt.plot(train_loss, label='Training loss')
+    plt.plot(valid_loss, label='Valid loss')
+    plt.legend()
+    plt.grid()
 
 
     # =========================================
