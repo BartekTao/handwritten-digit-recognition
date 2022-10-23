@@ -145,8 +145,8 @@ def main():
     # =================
     # TODO 12: set up datasets
     # hint: ImageFolder?
-    train_data = datasets.MNIST(TRAIN_DATA_PATH, download=True, train=True, transform=train_transform)
-    valid_data = datasets.MNIST(VALID_DATA_PATH, download=True, train=False, transform=valid_transform)
+    train_data = datasets.ImageFolder(TRAIN_DATA_PATH, transform=train_transform)
+    valid_data = datasets.ImageFolder(VALID_DATA_PATH, transform=valid_transform)
     # =================
 
 
