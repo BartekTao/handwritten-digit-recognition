@@ -9,11 +9,19 @@ class Net(nn.Module):
         super().__init__()
         # ==========================
         # TODO 1: build your network
+        self.pool = nn.MaxPool2d(kernel_size=2, stride=2, padding=0)
+        self.relu = nn.ReLU()
 
+        self.conv1 = nn.Conv2d(in_channels=3, out_channels=6, kernel_size=3, stride=1, padding=1)
+        self.conv2 = nn.Conv2d(in_channels=6, out_channels=16, kernel_size=3, stride=1, padding=1)
 
+        self.fc1 = nn.Linear(in_features=(16 * 64 * 64), out_features=120)
+        self.fc2 = nn.Linear(in_features=120, out_features=84)
+        self.fc3 = nn.Linear(in_features=84, out_features=10)
+
+        self.logsoftmax = nn.LogSoftmax()
 
         # ==========================
-
 
     def forward(self, x):
         # (batch_size, 3, 256, 256)
@@ -24,11 +32,26 @@ class Net(nn.Module):
         # example:
         # out = self.relu(self.conv1(x))
         # (batch_size, 64, 256, 256)
+
+        out = self.relu(self.conv1(x))
+        # (batch_size, 6, 256, 256)
+
+        out = self.pool(out)
+        # (batch_size, 6, 128, 128)
+
+        out = self.relu(self.conv2(out))
+        # (batch_size, 16, 128, 128)
+
+        out = self.pool(out)
+        # (batch_size, 16, 64, 64)
+
+        out = torch.flatten(out, 1)
+        # TODO 4: fully connected layers
+        out = self.fc1(out)
+        out = self.fc2(out)
+        out = self.fc3(out)
         
-
-
-        # ========================
-        return out
+        return self.logsoftmax(out)
 
 
 def calc_acc(output, target):
@@ -120,8 +143,8 @@ def main():
     LEARNING_RATE = 0.01
     BATCH_SIZE = 50
     EPOCHS = 10
-    TRAIN_DATA_PATH = './data/train/'
-    VALID_DATA_PATH = './data/valid/'
+    TRAIN_DATA_PATH = '/content/drive/MyDrive/data/train'
+    VALID_DATA_PATH = '/content/drive/MyDrive/data/train'
     MODEL_PATH = 'hanwritten-digit.pt'
 
     # ========================
@@ -146,7 +169,14 @@ def main():
     # TODO 12: set up datasets
     # hint: ImageFolder?
     train_data = datasets.ImageFolder(TRAIN_DATA_PATH, transform=train_transform)
-    valid_data = datasets.ImageFolder(VALID_DATA_PATH, transform=valid_transform)
+    #切分70%當作訓練集、30%當作驗證集
+    train_size = int(0.7 * len(train_data))
+    valid_size = len(train_data) - train_size
+    train_data, valid_data = torch.utils.data.random_split(train_data, [train_size, valid_size])
+    
+    # train_data = datasets.ImageFolder(TRAIN_DATA_PATH, transform=train_transform)
+    # valid_data = datasets.ImageFolder(VALID_DATA_PATH, transform=valid_transform)
+
     # =================
 
 
