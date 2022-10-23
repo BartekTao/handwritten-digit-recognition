@@ -225,6 +225,11 @@ def main():
     plt.plot(train_loss, label='Training loss')
     plt.plot(valid_loss, label='Valid loss')
     plt.legend()
+
+    plt.plot(train_acc, label='Training acc')
+    plt.plot(valid_acc, label='Valid acc')
+    plt.legend()
+
     plt.grid()
 
 
