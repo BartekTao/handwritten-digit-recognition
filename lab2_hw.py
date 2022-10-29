@@ -107,12 +107,13 @@ def validation(model, device, valid_loader, criterion):
 
             # ================================
             # TODO 8: calculate accuracy, loss
+            valid_acc += calc_acc(output, target)
             valid_loss += criterion(output, target)
 
-            probabilities = torch.exp(output)
-            top_prob, top_class = probabilities.topk(1, dim=1)
-            predictions = top_class == target.view(*top_class.shape)
-            valid_acc += torch.mean(predictions.type(torch.FloatTensor))
+            # probabilities = torch.exp(output)
+            # top_prob, top_class = probabilities.topk(1, dim=1)
+            # predictions = top_class == target.view(*top_class.shape)
+            # valid_acc += torch.mean(predictions.type(torch.FloatTensor))
 
 
             # ================================
@@ -135,8 +136,9 @@ def main():
     # you can add your parameters here
     LEARNING_RATE = 0.01
     BATCH_SIZE = 50
-    EPOCHS = 100
-    TRAIN_DATA_PATH = '/content/drive/MyDrive/data/train'
+    EPOCHS = 10
+    TRAIN_DATA_PATH = './data/train'
+    # TRAIN_DATA_PATH = '/content/drive/MyDrive/data/train'
     VALID_DATA_PATH = '/content/drive/MyDrive/data/train'
     MODEL_PATH = 'hanwritten-digit.pt'
 
@@ -169,11 +171,11 @@ def main():
     #切分80%當作訓練集、20%當作驗證集
     train_size = int(0.8 * len(valid_data))
     valid_size = len(valid_data) - train_size
-    # train_data, _ = torch.utils.data.random_split(train_data, [train_size, valid_size])
-    train_data2 = torch.utils.data.Subset(valid_data, range(train_size))
-    valid_data = torch.utils.data.Subset(valid_data, range(train_size, len(valid_data)))
-    # train_data2, valid_data = torch.utils.data.random_split(valid_data, [train_size, valid_size])
-    train_data = torch.utils.data.Subset(train_data, range(train_size))
+    train_data, _ = torch.utils.data.random_split(train_data, [train_size, valid_size])
+    # train_data2 = torch.utils.data.Subset(valid_data, range(train_size))
+    # valid_data = torch.utils.data.Subset(valid_data, range(train_size, len(valid_data)))
+    train_data2, valid_data = torch.utils.data.random_split(valid_data, [train_size, valid_size])
+    # train_data = torch.utils.data.Subset(train_data, range(train_size))
     train_data = torch.utils.data.ConcatDataset([train_data2, train_data])
     
     # train_data = datasets.ImageFolder(TRAIN_DATA_PATH, transform=train_transform)
