@@ -170,8 +170,10 @@ def main():
     train_size = int(0.8 * len(valid_data))
     valid_size = len(valid_data) - train_size
     # train_data, _ = torch.utils.data.random_split(train_data, [train_size, valid_size])
-    train_data2, valid_data = torch.utils.data.random_split(valid_data, [train_size, valid_size])
-
+    train_data2 = torch.utils.data.Subset(valid_data, range(train_size))
+    valid_data = torch.utils.data.Subset(valid_data, range(train_size, len(valid_data)))
+    # train_data2, valid_data = torch.utils.data.random_split(valid_data, [train_size, valid_size])
+    train_data = torch.utils.data.Subset(train_data, range(train_size))
     train_data = torch.utils.data.ConcatDataset([train_data2, train_data])
     
     # train_data = datasets.ImageFolder(TRAIN_DATA_PATH, transform=train_transform)
@@ -182,7 +184,7 @@ def main():
 
     # ============================
     # TODO 13 : set up dataloaders
-    train_loader = torch.utils.data.DataLoader(train_data2, batch_size=BATCH_SIZE, shuffle=True)
+    train_loader = torch.utils.data.DataLoader(train_data, batch_size=BATCH_SIZE, shuffle=True)
     valid_loader = torch.utils.data.DataLoader(valid_data, batch_size=BATCH_SIZE, shuffle=True)
     # ============================
 
