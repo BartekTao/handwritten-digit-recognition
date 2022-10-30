@@ -14,9 +14,11 @@ class Net(nn.Module):
         self.relu = nn.ReLU()
 
         self.conv1 = nn.Conv2d(in_channels=3, out_channels=32, kernel_size=3, stride=1, padding=1)
+        self.conv3 = nn.Conv2d(in_channels=32, out_channels=32, kernel_size=3, stride=1, padding=1)
         self.conv2 = nn.Conv2d(in_channels=32, out_channels=64, kernel_size=3, stride=1, padding=1)
+        self.conv4 = nn.Conv2d(in_channels=64, out_channels=64, kernel_size=3, stride=1, padding=1)
 
-        self.fc1 = nn.Linear(in_features=(64 * 16 * 16), out_features=128)
+        self.fc1 = nn.Linear(in_features=(64 * 8 * 8), out_features=128)
         self.fc2 = nn.Linear(in_features=128, out_features=10)
 
         # ==========================
@@ -34,8 +36,14 @@ class Net(nn.Module):
         out = self.relu(self.conv1(x))
         # (batch_size, 32, 256, 256)
 
+        out = self.relu(self.conv3(out))
+
+        out = self.pool(out)
+
         out = self.relu(self.conv2(out))
         # (batch_size, 64, 256, 256)
+
+        out = self.relu(self.conv4(out))
 
         out = self.pool(out)
         # (batch_size, 64, 128, 128)
@@ -138,14 +146,15 @@ def main():
     # you can add your parameters here
     LEARNING_RATE = 0.01
     BATCH_SIZE = 50
-    EPOCHS = 50
+    EPOCHS = 100
 
-    TRAIN_DATA_PATH = './resized2/train'
-    VALID_DATA_PATH = './resized2/valid'
+    # TRAIN_DATA_PATH = './resized2/train'
+    # VALID_DATA_PATH = './resized2/valid'
 
-    # TRAIN_DATA_PATH = '/content/drive/MyDrive/data/train'
-    # VALID_DATA_PATH = '/content/drive/MyDrive/data/valid'
+    TRAIN_DATA_PATH = '/content/drive/MyDrive/resized2/train'
+    VALID_DATA_PATH = '/content/drive/MyDrive/resized2/valid'
     MODEL_PATH = 'hanwritten-digit.pt'
+    MODEL_PATH = '/content/drive/MyDrive/data/hanwritten-digit_雙層.pt'
 
     # ========================
 
@@ -155,7 +164,7 @@ def main():
     train_transform = transforms.Compose([
         # may be adding some data augmentations?
         transforms.Resize(36),
-        transforms.RandomResizedCrop(32, (0.4, 0.7)),
+        transforms.RandomResizedCrop(32, (0.3, 0.6)),
         transforms.RandomRotation((-30, 30)),
         transforms.ToTensor(),
         transforms.Normalize([0.5, 0.5, 0.5], [0.5, 0.5, 0.5])
@@ -240,40 +249,51 @@ def main():
     valid_acc = [0.0] * EPOCHS
     valid_loss = [0.0] * EPOCHS
 
-    print('Start training...')
-    for epoch in range(EPOCHS):
-        print(f'epoch {epoch} start...')
+    # print('Start training...')
+    # for epoch in range(EPOCHS):
+    #     print(f'epoch {epoch} start...')
 
-        train_acc[epoch], train_loss[epoch] = training(model, device, train_loader, criterion, optimizer)
-        valid_acc[epoch], valid_loss[epoch] = validation(model, device, valid_loader, criterion)
+    #     train_acc[epoch], train_loss[epoch] = training(model, device, train_loader, criterion, optimizer)
+    #     valid_acc[epoch], valid_loss[epoch] = validation(model, device, valid_loader, criterion)
 
-        print(f'epoch={epoch} train_acc={train_acc[epoch]} train_loss={train_loss[epoch]} valid_acc={valid_acc[epoch]} valid_loss={valid_loss[epoch]}')
-    print('Training finished')
-
-
-    # ==================================
-    # TODO 15: save the model parameters
-    torch.save(model, MODEL_PATH)
-    # ==================================
+    #     print(f'epoch={epoch} train_acc={train_acc[epoch]} train_loss={train_loss[epoch]} valid_acc={valid_acc[epoch]} valid_loss={valid_loss[epoch]}')
+    # print('Training finished')
 
 
-    # ========================================
-    # TODO 16: draw accuracy and loss pictures
-    # lab2_teamXX_accuracy.png, lab2_teamXX_loss.png
-    # hint: plt.plot
-    plt.figure("loss")
-    plt.plot(train_loss, label='Training loss')
-    plt.plot(valid_loss, label='Valid loss')
-    plt.legend()
+    # # ==================================
+    # # TODO 15: save the model parameters
+    # torch.save(model, MODEL_PATH)
+    # # ==================================
 
-    plt.figure("acc")
-    plt.plot(train_acc, label='Training acc')
-    plt.plot(valid_acc, label='Valid acc')
-    plt.legend()
-    plt.show()
+
+    # # ========================================
+    # # TODO 16: draw accuracy and loss pictures
+    # # lab2_teamXX_accuracy.png, lab2_teamXX_loss.png
+    # # hint: plt.plot
+    # plt.figure("loss")
+    # plt.plot(train_loss, label='Training loss')
+    # plt.plot(valid_loss, label='Valid loss')
+    # plt.legend()
+
+    # plt.figure("acc")
+    # plt.plot(train_acc, label='Training acc')
+    # plt.plot(valid_acc, label='Valid acc')
+    # plt.legend()
+    # plt.show()
 
 
     # =========================================
+    test_loader = torch.utils.data.DataLoader(
+        datasets.MNIST('/files/', train=False, download=True,
+        transform=transforms.Compose([
+            transforms.Resize(32),
+            transforms.ToTensor(),
+            transforms.Normalize([0.5, 0.5, 0.5], [0.5, 0.5, 0.5])
+        ])),
+        batch_size=BATCH_SIZE, shuffle=True)
+    model = torch.load(MODEL_PATH)
+    valid_acc, valid_loss = validation(model, device, test_loader, criterion)
+    print(f'valid_acc={valid_acc} valid_loss={valid_loss}')
 
 
 if __name__ == '__main__':
