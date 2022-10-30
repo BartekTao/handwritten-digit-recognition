@@ -138,7 +138,7 @@ def main():
     # you can add your parameters here
     LEARNING_RATE = 0.01
     BATCH_SIZE = 50
-    EPOCHS = 3
+    EPOCHS = 50
     # TRAIN_DATA_PATH = './data/train'
     TRAIN_DATA_PATH = '/content/drive/MyDrive/data/train'
     VALID_DATA_PATH = '/content/drive/MyDrive/data/valid'
@@ -152,7 +152,8 @@ def main():
     train_transform = transforms.Compose([
         # may be adding some data augmentations?
         # transforms.Resize(36),
-        transforms.RandomResizedCrop(256, (0.6, 1)),
+        transforms.RandomResizedCrop(256, (0.1, 0.6)),
+        transforms.RandomRotation((-20, 20)),
         transforms.ToTensor(),
         transforms.Normalize([0.5, 0.5, 0.5], [0.5, 0.5, 0.5])
     ])
@@ -197,27 +198,27 @@ def main():
     # ============================
 
     # check transfrom image
-    dataiter = iter(train_loader)
-    dataiter2 = iter(valid_loader)
+    # dataiter = iter(train_loader)
+    # dataiter2 = iter(valid_loader)
 
-    images, labels = dataiter.next()
-    images2, labels2 = dataiter2.next()
+    # images, labels = dataiter.next()
+    # images2, labels2 = dataiter2.next()
 
-    images = images.numpy()
-    images2 = images2.numpy()
+    # images = images.numpy()
+    # images2 = images2.numpy()
 
-    #plot
-    fig = plt.figure(figsize=(25,4))
+    # #plot
+    # fig = plt.figure(figsize=(25,4))
 
-    for idx in np.arange(20):
-        ax = fig.add_subplot(1, 20, idx+1, xticks=[], yticks=[])
-        plt.imshow(np.transpose(images[idx] * 255, (1,2,0)))
+    # for idx in np.arange(20):
+    #     ax = fig.add_subplot(1, 20, idx+1, xticks=[], yticks=[])
+    #     plt.imshow(np.transpose(images[idx] * 255, (1,2,0)))
 
-    fig2 = plt.figure(figsize=(25,4))
+    # fig2 = plt.figure(figsize=(25,4))
 
-    for idx in np.arange(20):
-        ax = fig2.add_subplot(1, 20, idx+1, xticks=[], yticks=[])
-        plt.imshow(np.transpose(images2[idx] * 255, (1,2,0)))
+    # for idx in np.arange(20):
+    #     ax = fig2.add_subplot(1, 20, idx+1, xticks=[], yticks=[])
+    #     plt.imshow(np.transpose(images2[idx] * 255, (1,2,0)))
     # ================================
 
     # build model, criterion and optimizer
