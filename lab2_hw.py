@@ -16,7 +16,7 @@ class Net(nn.Module):
         self.conv1 = nn.Conv2d(in_channels=3, out_channels=32, kernel_size=3, stride=1, padding=1)
         self.conv2 = nn.Conv2d(in_channels=32, out_channels=64, kernel_size=3, stride=1, padding=1)
 
-        self.fc1 = nn.Linear(in_features=(64 * 128 * 128), out_features=128)
+        self.fc1 = nn.Linear(in_features=(64 * 16 * 16), out_features=128)
         self.fc2 = nn.Linear(in_features=128, out_features=10)
 
         # ==========================
@@ -126,7 +126,7 @@ def validation(model, device, valid_loader, criterion):
 
 
 def main():
-    torch.manual_seed(0)
+    # torch.manual_seed(0)
     # ==================
     # TODO 9: set device
     device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
@@ -139,9 +139,12 @@ def main():
     LEARNING_RATE = 0.01
     BATCH_SIZE = 50
     EPOCHS = 50
-    # TRAIN_DATA_PATH = './data/train'
-    TRAIN_DATA_PATH = '/content/drive/MyDrive/data/train'
-    VALID_DATA_PATH = '/content/drive/MyDrive/data/valid'
+
+    TRAIN_DATA_PATH = './resized2/train'
+    VALID_DATA_PATH = './resized2/valid'
+
+    # TRAIN_DATA_PATH = '/content/drive/MyDrive/data/train'
+    # VALID_DATA_PATH = '/content/drive/MyDrive/data/valid'
     MODEL_PATH = 'hanwritten-digit.pt'
 
     # ========================
@@ -151,14 +154,15 @@ def main():
     # TODO 11: transforms
     train_transform = transforms.Compose([
         # may be adding some data augmentations?
-        # transforms.Resize(36),
-        transforms.RandomResizedCrop(256, (0.1, 0.6)),
-        transforms.RandomRotation((-20, 20)),
+        transforms.Resize(36),
+        transforms.RandomResizedCrop(32, (0.4, 0.7)),
+        transforms.RandomRotation((-30, 30)),
         transforms.ToTensor(),
         transforms.Normalize([0.5, 0.5, 0.5], [0.5, 0.5, 0.5])
     ])
     # ===================
     valid_transform = transforms.Compose([
+        transforms.Resize(32),
         transforms.ToTensor(),
         transforms.Normalize([0.5, 0.5, 0.5], [0.5, 0.5, 0.5])
     ])
@@ -199,7 +203,7 @@ def main():
 
     # check transfrom image
     # dataiter = iter(train_loader)
-    # dataiter2 = iter(valid_loader)
+    # dataiter2 = iter(train_loader2)
 
     # images, labels = dataiter.next()
     # images2, labels2 = dataiter2.next()
