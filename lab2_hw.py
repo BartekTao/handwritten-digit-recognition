@@ -139,9 +139,9 @@ def main():
     LEARNING_RATE = 0.01
     BATCH_SIZE = 50
     EPOCHS = 3
-    TRAIN_DATA_PATH = './data/train'
-    # TRAIN_DATA_PATH = '/content/drive/MyDrive/data/train'
-    VALID_DATA_PATH = '/content/drive/MyDrive/data/train'
+    # TRAIN_DATA_PATH = './data/train'
+    TRAIN_DATA_PATH = '/content/drive/MyDrive/data/train'
+    VALID_DATA_PATH = '/content/drive/MyDrive/data/valid'
     MODEL_PATH = 'hanwritten-digit.pt'
 
     # ========================
@@ -166,21 +166,22 @@ def main():
     # =================
     # TODO 12: set up datasets
     # hint: ImageFolder?
-    train_data = datasets.ImageFolder(TRAIN_DATA_PATH, transform=train_transform)
-    valid_data = datasets.ImageFolder(TRAIN_DATA_PATH, transform=valid_transform)
+    train_data = datasets.ImageFolder(TRAIN_DATA_PATH, transform=valid_transform)
+    train_data2 = datasets.ImageFolder(TRAIN_DATA_PATH, transform=train_transform)
+    valid_data = datasets.ImageFolder(VALID_DATA_PATH, transform=valid_transform)
 
     #切分80%當作訓練集、20%當作驗證集
-    train_size = int(0.8 * len(valid_data))
-    valid_size = len(valid_data) - train_size
+    # train_size = int(0.8 * len(valid_data))
+    # valid_size = len(valid_data) - train_size
 
-    train_data2 = torch.utils.data.Subset(valid_data, range(train_size))
-    valid_data = torch.utils.data.Subset(valid_data, range(train_size, len(valid_data)))
-    train_data = torch.utils.data.Subset(train_data, range(train_size))
+    # train_data2 = torch.utils.data.Subset(valid_data, range(train_size))
+    # valid_data = torch.utils.data.Subset(valid_data, range(train_size, len(valid_data)))
+    # train_data = torch.utils.data.Subset(train_data, range(train_size))
 
     # train_data, _ = torch.utils.data.random_split(train_data, [train_size, valid_size])
     # train_data2, valid_data = torch.utils.data.random_split(valid_data, [train_size, valid_size])
     
-    train_data = torch.utils.data.ConcatDataset([train_data2, train_data])
+    train_data = torch.utils.data.ConcatDataset([train_data, train_data2])
     
     # train_data = datasets.ImageFolder(TRAIN_DATA_PATH, transform=train_transform)
     # valid_data = datasets.ImageFolder(VALID_DATA_PATH, transform=valid_transform)
