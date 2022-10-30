@@ -2,8 +2,8 @@ import os
 import cv2
 import numpy as np
 
-origin_path = './data/train'
-resized_path = './resized/train'
+origin_path = './data/valid'
+resized_path = './resized2/valid'
 ext = '.png'
 
 print('start converting...')
@@ -25,7 +25,7 @@ for i in range(0,10):
         # cv2.destroyAllWindows()
 
         # 腐蚀范围2x2
-        kernel = np.ones((5,5),np.uint8)
+        kernel = np.ones((4,4),np.uint8)
         # 迭代次数 iterations=1
         erosion = cv2.erode(image,kernel,iterations = 3)
         # cv2.imshow('erosion',erosion)
