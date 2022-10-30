@@ -15,7 +15,7 @@ class Net(nn.Module):
         self.conv1 = nn.Conv2d(in_channels=3, out_channels=32, kernel_size=3, stride=1, padding=1)
         self.conv2 = nn.Conv2d(in_channels=32, out_channels=64, kernel_size=3, stride=1, padding=1)
 
-        self.fc1 = nn.Linear(in_features=(64 * 16 * 16), out_features=128)
+        self.fc1 = nn.Linear(in_features=(64 * 128 * 128), out_features=128)
         self.fc2 = nn.Linear(in_features=128, out_features=10)
 
         # ==========================
@@ -125,6 +125,7 @@ def validation(model, device, valid_loader, criterion):
 
 
 def main():
+    torch.manual_seed(0)
     # ==================
     # TODO 9: set device
     device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
@@ -136,9 +137,9 @@ def main():
     # you can add your parameters here
     LEARNING_RATE = 0.01
     BATCH_SIZE = 50
-    EPOCHS = 10
-    TRAIN_DATA_PATH = './data/train'
-    # TRAIN_DATA_PATH = '/content/drive/MyDrive/data/train'
+    EPOCHS = 100
+    # TRAIN_DATA_PATH = './data/train'
+    TRAIN_DATA_PATH = '/content/drive/MyDrive/data/train'
     VALID_DATA_PATH = '/content/drive/MyDrive/data/train'
     MODEL_PATH = 'hanwritten-digit.pt'
 
@@ -149,14 +150,13 @@ def main():
     # TODO 11: transforms
     train_transform = transforms.Compose([
         # may be adding some data augmentations?
-        transforms.Resize(36),
-        transforms.RandomResizedCrop(32, (0.5, 0.8)),
+        # transforms.Resize(36),
+        transforms.RandomResizedCrop(256, (0.6, 1)),
         transforms.ToTensor(),
         transforms.Normalize([0.5, 0.5, 0.5], [0.5, 0.5, 0.5])
     ])
     # ===================
     valid_transform = transforms.Compose([
-        transforms.Resize(32),
         transforms.ToTensor(),
         transforms.Normalize([0.5, 0.5, 0.5], [0.5, 0.5, 0.5])
     ])
