@@ -1,4 +1,5 @@
 import os
+import numpy as np
 import torch
 import torch.nn as nn
 from torchvision import transforms, datasets
@@ -137,9 +138,9 @@ def main():
     # you can add your parameters here
     LEARNING_RATE = 0.01
     BATCH_SIZE = 50
-    EPOCHS = 100
-    # TRAIN_DATA_PATH = './data/train'
-    TRAIN_DATA_PATH = '/content/drive/MyDrive/data/train'
+    EPOCHS = 3
+    TRAIN_DATA_PATH = './data/train'
+    # TRAIN_DATA_PATH = '/content/drive/MyDrive/data/train'
     VALID_DATA_PATH = '/content/drive/MyDrive/data/train'
     MODEL_PATH = 'hanwritten-digit.pt'
 
@@ -171,11 +172,14 @@ def main():
     #切分80%當作訓練集、20%當作驗證集
     train_size = int(0.8 * len(valid_data))
     valid_size = len(valid_data) - train_size
-    train_data, _ = torch.utils.data.random_split(train_data, [train_size, valid_size])
-    # train_data2 = torch.utils.data.Subset(valid_data, range(train_size))
-    # valid_data = torch.utils.data.Subset(valid_data, range(train_size, len(valid_data)))
-    train_data2, valid_data = torch.utils.data.random_split(valid_data, [train_size, valid_size])
-    # train_data = torch.utils.data.Subset(train_data, range(train_size))
+
+    train_data2 = torch.utils.data.Subset(valid_data, range(train_size))
+    valid_data = torch.utils.data.Subset(valid_data, range(train_size, len(valid_data)))
+    train_data = torch.utils.data.Subset(train_data, range(train_size))
+
+    # train_data, _ = torch.utils.data.random_split(train_data, [train_size, valid_size])
+    # train_data2, valid_data = torch.utils.data.random_split(valid_data, [train_size, valid_size])
+    
     train_data = torch.utils.data.ConcatDataset([train_data2, train_data])
     
     # train_data = datasets.ImageFolder(TRAIN_DATA_PATH, transform=train_transform)
@@ -187,8 +191,33 @@ def main():
     # ============================
     # TODO 13 : set up dataloaders
     train_loader = torch.utils.data.DataLoader(train_data, batch_size=BATCH_SIZE, shuffle=True)
+    train_loader2 = torch.utils.data.DataLoader(train_data2, batch_size=BATCH_SIZE, shuffle=True)
     valid_loader = torch.utils.data.DataLoader(valid_data, batch_size=BATCH_SIZE, shuffle=True)
     # ============================
+
+    # check transfrom image
+    dataiter = iter(train_loader)
+    dataiter2 = iter(valid_loader)
+
+    images, labels = dataiter.next()
+    images2, labels2 = dataiter2.next()
+
+    images = images.numpy()
+    images2 = images2.numpy()
+
+    #plot
+    fig = plt.figure(figsize=(25,4))
+
+    for idx in np.arange(20):
+        ax = fig.add_subplot(1, 20, idx+1, xticks=[], yticks=[])
+        plt.imshow(np.transpose(images[idx] * 255, (1,2,0)))
+
+    fig2 = plt.figure(figsize=(25,4))
+
+    for idx in np.arange(20):
+        ax = fig2.add_subplot(1, 20, idx+1, xticks=[], yticks=[])
+        plt.imshow(np.transpose(images2[idx] * 255, (1,2,0)))
+    # ================================
 
     # build model, criterion and optimizer
     model = Net().to(device).train()
