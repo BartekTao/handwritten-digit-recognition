@@ -4,6 +4,7 @@ import torch
 import torch.nn as nn
 from torchvision import transforms, datasets
 import matplotlib.pyplot as plt
+from PIL import Image, ImageOps
 
 class Net(nn.Module):
     def __init__(self):
@@ -148,13 +149,12 @@ def main():
     BATCH_SIZE = 50
     EPOCHS = 100
 
-    # TRAIN_DATA_PATH = './resized2/train'
-    # VALID_DATA_PATH = './resized2/valid'
+    TRAIN_DATA_PATH = './resized2/train'
+    VALID_DATA_PATH = './resized2/valid'
 
-    TRAIN_DATA_PATH = '/content/drive/MyDrive/resized2/train'
-    VALID_DATA_PATH = '/content/drive/MyDrive/resized2/valid'
+    # TRAIN_DATA_PATH = '/content/drive/MyDrive/resized2/train'
+    # VALID_DATA_PATH = '/content/drive/MyDrive/resized2/valid'
     MODEL_PATH = 'hanwritten-digit.pt'
-    MODEL_PATH = '/content/drive/MyDrive/data/hanwritten-digit_雙層.pt'
 
     # ========================
 
@@ -283,15 +283,29 @@ def main():
 
 
     # =========================================
+
     test_loader = torch.utils.data.DataLoader(
-        datasets.MNIST('/files/', train=False, download=True,
+        datasets.MNIST('./data', train=False, download=True,
         transform=transforms.Compose([
+            transforms.Lambda(lambda x: ImageOps.invert(x)),
             transforms.Resize(32),
             transforms.ToTensor(),
+            transforms.Lambda(lambda x: x.repeat(3, 1, 1)),
             transforms.Normalize([0.5, 0.5, 0.5], [0.5, 0.5, 0.5])
         ])),
         batch_size=BATCH_SIZE, shuffle=True)
-    model = torch.load(MODEL_PATH)
+
+    # dataiter = iter(test_loader)
+    # images, labels = dataiter.next()
+    # images = images.numpy()
+    # #plot
+    # fig = plt.figure(figsize=(25,4))
+    # for idx in np.arange(20):
+    #     ax = fig.add_subplot(1, 20, idx+1, xticks=[], yticks=[])
+    #     plt.imshow(np.transpose(images[idx] * 255, (1,2,0)))
+
+    MODEL_PATH = 'hanwritten-digit.pt'
+    model = torch.load(MODEL_PATH, map_location='cpu')
     valid_acc, valid_loss = validation(model, device, test_loader, criterion)
     print(f'valid_acc={valid_acc} valid_loss={valid_loss}')
 
